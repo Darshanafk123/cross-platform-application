@@ -1,37 +1,78 @@
-import { Text, View, TextInput } from "react-native";
-import { useState } from "react";
+import React, { useContext, useState } from "react";
+import {
+  View,
+  StyleSheet,
+  Button,
+  SafeAreaView,
+} from "react-native";
 
-export default function Index() {
-  const [input, setInput] = useState("");
+import Navbar from "../components/Navbar";
+import Column from "../components/Column";
+import AddTaskModal from "../components/AddTaskModal";
+import { TaskProvider, TaskContext } from "../context/TaskC0ntext";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 
-  // reverse the string whenever input changes
-  const reversed = input.split("").reverse().join("");
+function Board() {
+  const { tasks } = useContext(TaskContext);
+  const [modalVisible, setModalVisible] = useState(false);
 
   return (
-    <View
-      style={{
-        flex: 1,
-        justifyContent: "center",
-        alignItems: "center",
-        padding: 16,
-      }}
-    >
-      <TextInput
-        style={{
-          width: "80%",
-          borderColor: "orange",
-          borderWidth: 1,
-          padding: 8,
-          marginBottom: 16,
-        }}
-        placeholder="Type something"
-        value={input}
-        onChangeText={setInput}
+    <SafeAreaView style={{ flex: 1 }}>
+      <Navbar />
+
+      <Button title="Add Task" onPress={() => setModalVisible(true)} />
+
+      <View style={styles.row}>
+        <Column
+          title="Todo"
+          status="todo"
+          tasks={tasks.filter(t => t.status === "todo")}
+        />
+
+        <Column
+          title="In Process"
+          status="inprocess"
+          tasks={tasks.filter(t => t.status === "inprocess")}
+        />
+      </View>
+
+      <View style={styles.row}>
+        <Column
+          title="Review"
+          status="review"
+          tasks={tasks.filter(t => t.status === "review")}
+        />
+
+        <Column
+          title="Completed"
+          status="completed"
+          tasks={tasks.filter(t => t.status === "completed")}
+        />
+      </View>
+
+      <AddTaskModal
+        visible={modalVisible}
+        onClose={() => setModalVisible(false)}
       />
-      <Text style={{ fontSize: 18 }}>Reversed:</Text>
-      <Text style={{ fontSize: 24, fontWeight: "bold", marginTop: 8 }}>
-        {reversed}
-      </Text>
-    </View>
+    </SafeAreaView>
   );
 }
+
+export default function App() {
+  return (
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <TaskProvider>
+        <Board />
+      </TaskProvider>
+    </GestureHandlerRootView>
+  );
+}
+
+const styles = StyleSheet.create({
+  row: {
+    flexDirection: "row",
+    flex: 1,
+    gap: 10,
+    padding: 10,
+  },
+});
