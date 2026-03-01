@@ -19,7 +19,7 @@ export default function Index() {
       <TextInput
         style={{
           width: "80%",
-          borderColor: "gray",
+          borderColor: "orange",
           borderWidth: 1,
           padding: 8,
           marginBottom: 16,
