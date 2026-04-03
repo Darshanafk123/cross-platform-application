@@ -8,4 +8,5 @@ export interface Task {
   id: string;
   title: string;
   status: TaskStatus;
+  assignedTo: string;
 }

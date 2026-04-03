@@ -4,7 +4,7 @@ import { saveTasks, loadTasks } from "../storage/taskStorage";
 
 interface TaskContextType {
   tasks: Task[];
-  addTask: (title: string) => void;
+  addTask: (title: string, assignedTo: string) => void;
   moveTask: (taskId: string, status: TaskStatus) => void;
   deleteTask: (taskId: string) => void;
 }
@@ -27,10 +27,11 @@ export function TaskProvider({ children }: { children: ReactNode }) {
     saveTasks(tasks);
   }, [tasks]);
 
-  function addTask(title: string) {
+  function addTask(title: string, assignedTo: string) {
     const newTask: Task = {
       id: Date.now().toString(),
       title,
+      assignedTo,
       status: "todo",
     };
     setTasks(prev => [...prev, newTask]);

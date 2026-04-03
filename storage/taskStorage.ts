@@ -14,6 +14,7 @@ export async function saveTasks(tasks: Task[]) {
 export async function loadTasks(): Promise<Task[]> {
   try {
     const data = await AsyncStorage.getItem(STORAGE_KEY);
+    console.log("Raw storage:", data);
     return data ? JSON.parse(data) : [];
   } catch (e) {
     console.log("Error loading tasks", e);

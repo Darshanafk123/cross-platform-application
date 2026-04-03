@@ -10,7 +10,7 @@ export default function Navbar() {
 
 const styles = StyleSheet.create({
   navbar: {
-    backgroundColor: "#0d6efd",
+    backgroundColor: "#fd810d",
     padding: 15,
     alignItems: "center",
   },

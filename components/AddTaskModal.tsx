@@ -1,21 +1,43 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import {
   Modal,
   View,
   TextInput,
   Button,
   StyleSheet,
+  Text,
 } from "react-native";
 import { TaskContext } from "../context/TaskC0ntext";
+import { Picker } from "@react-native-picker/picker";
+import { loadTeam } from "../storage/teamstorage";
 
 export default function AddTaskModal({ visible, onClose }: any) {
   const [title, setTitle] = useState("");
+  const [assignedTo, setAssignedTo] = useState("");
+  const [users, setUsers] = useState<any[]>([]);
+  const PickerAny = Picker as any;
+
   const { addTask } = useContext(TaskContext);
 
+  // ✅ Load team users
+  useEffect(() => {
+    async function fetchUsers() {
+      const team = await loadTeam();
+      if (team?.users) {
+        setUsers(team.users);
+      }
+    }
+    fetchUsers();
+  }, []);
+
   function handleAdd() {
-    if (!title) return;
-    addTask(title);
+    if (!title || !assignedTo) return;
+
+    addTask(title, assignedTo);
+
     setTitle("");
+    setAssignedTo("");
+
     onClose();
   }
 
@@ -23,15 +45,36 @@ export default function AddTaskModal({ visible, onClose }: any) {
     <Modal visible={visible} transparent>
       <View style={styles.container}>
         <View style={styles.modal}>
+
+          {/* Task Title */}
           <TextInput
             placeholder="Task title"
             value={title}
             onChangeText={setTitle}
-            style={styles.input}
+            style={{marginBottom: 10}}
           />
+
+          {/* 👇 Dropdown for users */}
+          <Text>Select User</Text>
+          <PickerAny
+            selectedValue={assignedTo}
+            onValueChange={(itemValue: string) => setAssignedTo(itemValue)}
+            style={styles.input}
+          >
+            <PickerAny.Item label="Select a user" value="" />
+
+            {users.map((u) => (
+              <PickerAny.Item
+                key={u.id}
+                label={`${u.name} (${u.id})`}
+                value={u.id}
+              />
+            ))}
+          </PickerAny>
 
           <Button title="Add" onPress={handleAdd} />
           <Button title="Cancel" onPress={onClose} />
+
         </View>
       </View>
     </Modal>

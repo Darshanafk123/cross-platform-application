@@ -11,62 +11,23 @@ import Column from "../components/Column";
 import AddTaskModal from "../components/AddTaskModal";
 import { TaskProvider, TaskContext } from "../context/TaskC0ntext";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { AuthProvider } from "../context/AuthContext";
+import Login from "./login";
 
-function Board() {
-  const { tasks } = useContext(TaskContext);
-  const [modalVisible, setModalVisible] = useState(false);
 
-  return (
-    <SafeAreaView style={{ flex: 1 }}>
-      <Navbar />
 
-      <Button title="Add Task" onPress={() => setModalVisible(true)} />
-
-      <View style={styles.row}>
-        <Column
-          title="Todo"
-          status="todo"
-          tasks={tasks.filter(t => t.status === "todo")}
-        />
-
-        <Column
-          title="In Process"
-          status="inprocess"
-          tasks={tasks.filter(t => t.status === "inprocess")}
-        />
-      </View>
-
-      <View style={styles.row}>
-        <Column
-          title="Review"
-          status="review"
-          tasks={tasks.filter(t => t.status === "review")}
-        />
-
-        <Column
-          title="Completed"
-          status="completed"
-          tasks={tasks.filter(t => t.status === "completed")}
-        />
-      </View>
-
-      <AddTaskModal
-        visible={modalVisible}
-        onClose={() => setModalVisible(false)}
-      />
-    </SafeAreaView>
-  );
-}
-
-export default function App() {
+export default function Index() {
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-      <TaskProvider>
-        <Board />
-      </TaskProvider>
+      <AuthProvider>
+        <TaskProvider>
+          <Login />
+        </TaskProvider>
+      </AuthProvider>
     </GestureHandlerRootView>
   );
 }
+
 
 const styles = StyleSheet.create({
   row: {
