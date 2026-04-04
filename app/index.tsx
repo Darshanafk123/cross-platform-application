@@ -20,9 +20,7 @@ export default function Index() {
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <AuthProvider>
-        <TaskProvider>
-          <Login />
-        </TaskProvider>
+        <Login />
       </AuthProvider>
     </GestureHandlerRootView>
   );

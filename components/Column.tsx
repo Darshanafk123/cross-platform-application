@@ -4,6 +4,7 @@ import DraggableFlatList from "react-native-draggable-flatlist";
 import TaskCard from "./TaskCard";
 import { Task, TaskStatus } from "../types/Task";
 import { TaskContext } from "../context/TaskC0ntext";
+import { AuthContext } from "../context/AuthContext";
 
 interface Props {
   title: string;
@@ -13,6 +14,7 @@ interface Props {
 
 export default function Column({ title, status, tasks }: Props) {
   const { moveTask } = useContext(TaskContext);
+  const { currentUser, role } = useContext(AuthContext);
 
   return (
     <View style={styles.column}>
@@ -21,11 +23,17 @@ export default function Column({ title, status, tasks }: Props) {
       <DraggableFlatList
         data={tasks}
         keyExtractor={item => item.id}
-        renderItem={({ item, drag }) => (
-          <View onTouchStart={drag}>
-            <TaskCard task={item} />
-          </View>
-        )}
+        renderItem={({ item, drag }) => {
+          const isOwner = item.assignedTo === currentUser?.id;
+          return (
+            <View
+              onTouchStart={isOwner || role === "admin" ? drag : undefined}
+              style={{ opacity: isOwner || role === "admin" ? 1 : 0.5 }}
+            >
+              <TaskCard task={item} />
+            </View>
+          );
+        }}
         onDragEnd={({ data }) => {
           data.forEach(task => {
             moveTask(task.id, status);
