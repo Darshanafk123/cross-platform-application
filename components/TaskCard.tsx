@@ -1,6 +1,6 @@
 import React, { useContext } from "react";
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
-import { Task } from "../types/Task";
+import { Task, TaskStatus } from "../types/Task";
 import { TaskContext } from "../context/TaskC0ntext";
 import { AuthContext } from "../context/AuthContext";
 
@@ -9,7 +9,7 @@ export default function TaskCard({ task }: { task: Task }) {
   const { role } = useContext(AuthContext) || {};
   console.log("ROLE:", role);
 
-  const flow = ["todo", "inprocess", "review", "completed"];
+  const flow: TaskStatus[] = ["todo", "inprocess", "review", "completed"];
 
   function moveForward() {
     const currentIndex = flow.indexOf(task.status);

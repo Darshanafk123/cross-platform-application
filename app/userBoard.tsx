@@ -2,6 +2,7 @@ import React, { useContext } from "react";
 import { SafeAreaView, View, StyleSheet } from "react-native";
 import Column from "../components/Column";
 import Navbar from "../components/Navbar";
+import { Stack } from "expo-router";
 
 import { TaskContext } from "../context/TaskC0ntext";
 import { AuthContext } from "../context/AuthContext";
@@ -17,6 +18,7 @@ export default function UserBoard() {
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
+      <Stack.Screen options = {{ title: `Welcome ${currentUser?.name || "User"} 👋` }} />
       <Navbar />
 
       <View style={styles.row}>
