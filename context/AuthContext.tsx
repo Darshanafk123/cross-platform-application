@@ -1,3 +1,4 @@
+// context/AuthContext.tsx
 import React, { createContext, useState, useEffect } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
@@ -33,9 +34,20 @@ export function AuthProvider({ children }: any) {
     }
   }
 
+  // ✅ Logout function - clears all auth data
+  async function logout() {
+    try {
+      setRoleState(null);
+      setCurrentUser(null);
+      await AsyncStorage.removeItem("ROLE");
+    } catch (e) {
+      console.log("Error during logout:", e);
+    }
+  }
+
   return (
     <AuthContext.Provider
-      value={{ role, setRole, currentUser, setCurrentUser }}
+      value={{ role, setRole, currentUser, setCurrentUser, logout }}
     >
       {children}
     </AuthContext.Provider>

@@ -1,3 +1,4 @@
+// app/board.tsx
 import React, { useContext, useState } from "react";
 import { View, StyleSheet, Button, SafeAreaView } from "react-native";
 

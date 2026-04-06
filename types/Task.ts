@@ -1,3 +1,4 @@
+// types/Task.ts
 export type TaskStatus =
   | "todo"
   | "inprocess"

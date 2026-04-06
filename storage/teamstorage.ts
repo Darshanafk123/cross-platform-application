@@ -1,3 +1,4 @@
+// storage/teamStorage.ts
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const TEAM_KEY = "JIRA_LITE_TEAM";

@@ -1,3 +1,4 @@
+// components/TaskCard.tsx
 import React, { useContext } from "react";
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import { Task, TaskStatus } from "../types/Task";
@@ -59,7 +60,7 @@ export default function TaskCard({ task }: { task: Task }) {
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: "white",
+    backgroundColor: "#1e1e1e",
     padding: 10,
     borderRadius: 8,
     marginBottom: 8,
@@ -70,6 +71,7 @@ const styles = StyleSheet.create({
   text: {
     fontSize: 16,
     flex: 1,
+    color: "#fff",
   },
   actions: {
     flexDirection: "row",
@@ -77,5 +79,6 @@ const styles = StyleSheet.create({
   },
   icon: {
     fontSize: 18,
+    color: "#fff",
   },
 });

@@ -1,3 +1,4 @@
+// app/createTeam.tsx
 import React, { useState } from "react";
 import {
   View,
@@ -8,18 +9,13 @@ import {
   FlatList,
 } from "react-native";
 import { saveTeam } from "../storage/teamstorage";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function CreateTeam() {
   const [teamName, setTeamName] = useState("");
+  const [teamCode, setTeamCode] = useState("");
   const [users, setUsers] = useState<any[]>([]);
   const [userName, setUserName] = useState("");
   const [userId, setUserId] = useState("");
-
-  // Generate random team code
-  function generateTeamCode() {
-    return Math.random().toString(36).substring(2, 8);
-  }
 
   function addUser() {
     if (!userName || !userId) return;
@@ -30,11 +26,14 @@ export default function CreateTeam() {
   }
 
   async function handleCreateTeam() {
-    if (!teamName || users.length === 0) return;
+    if (!teamName || !teamCode || users.length === 0) {
+      alert("Please enter team name, team code, and add at least one user");
+      return;
+    }
 
     const team = {
       teamName,
-      teamCode: generateTeamCode(),
+      teamCode,
       adminId: "admin", // for now static
       users,
     };
@@ -55,6 +54,14 @@ export default function CreateTeam() {
         placeholder="Enter Team Name"
         value={teamName}
         onChangeText={setTeamName}
+        style={styles.input}
+      />
+
+      {/* Team Code */}
+      <TextInput
+        placeholder="Enter Team Code"
+        value={teamCode}
+        onChangeText={setTeamCode}
         style={styles.input}
       />
 
@@ -86,14 +93,6 @@ export default function CreateTeam() {
             {item.name} ({item.id})
           </Text>
         )}
-      />
-      <Button
-      title ="Check Team Data"
-      onPress ={async () => {
-        const data = await AsyncStorage.getItem("JIRA_LITE_TEAM");
-        console.log("STORAGE DIRECT:", data);
-       }  
-      }
       />
 
       {/* Create Team */}

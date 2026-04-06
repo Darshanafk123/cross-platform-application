@@ -1,5 +1,6 @@
+// app/user.tsx
 import React, { useState, useContext } from "react";
-import { View, TextInput, Button, Alert, StyleSheet } from "react-native";
+import { View, Text, TouchableOpacity, TextInput, Button, Alert, StyleSheet } from "react-native";
 import { loadTeam } from "../storage/teamstorage";
 import { AuthContext } from "../context/AuthContext";
 import { useRouter } from "expo-router";
@@ -44,8 +45,15 @@ export default function UserLogin() {
 
   return (
     <View style={styles.container}>
+      <View style={styles.header}>
+        <TouchableOpacity onPress={() => router.back()}>
+          <Text style={styles.backText}>← Back</Text>
+        </TouchableOpacity>
+      </View>
+
       <TextInput
         placeholder="Team Name"
+        placeholderTextColor="#aaa"
         value={teamName}
         onChangeText={setTeamName}
         style={styles.input}
@@ -53,6 +61,7 @@ export default function UserLogin() {
 
       <TextInput
         placeholder="Team Code"
+        placeholderTextColor="#aaa"
         value={teamCode}
         onChangeText={setTeamCode}
         style={styles.input}
@@ -60,6 +69,7 @@ export default function UserLogin() {
 
       <TextInput
         placeholder="User ID"
+        placeholderTextColor="#aaa"
         value={userId}
         onChangeText={setUserId}
         style={styles.input}
@@ -75,10 +85,23 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 20,
     gap: 10,
+    backgroundColor: "#000",
   },
   input: {
     borderWidth: 1,
+    borderColor: "#444",
+    backgroundColor: "#111",
+    color: "#fff",
     padding: 10,
     borderRadius: 5,
+  },
+  header: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 20,
+  },
+  backText: {
+    color: "#fff",
+    fontSize: 18,
   },
 });

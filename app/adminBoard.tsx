@@ -1,3 +1,4 @@
+// app/adminBoard.tsx
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { TaskProvider } from "../context/TaskC0ntext";
 import Board from "./board"; // 👈 your existing board file

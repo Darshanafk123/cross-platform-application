@@ -1,3 +1,4 @@
+// components/Column.tsx
 import React, { useContext } from "react";
 import { View, Text, StyleSheet } from "react-native";
 import DraggableFlatList from "react-native-draggable-flatlist";
@@ -46,7 +47,7 @@ export default function Column({ title, status, tasks }: Props) {
 
 const styles = StyleSheet.create({
   column: {
-    backgroundColor: "#f1f3f5",
+    backgroundColor: "#111",
     padding: 10,
     borderRadius: 10,
     flex: 1,
@@ -54,5 +55,6 @@ const styles = StyleSheet.create({
   title: {
     fontWeight: "bold",
     marginBottom: 10,
+    color: "#fff",
   },
 });

@@ -1,3 +1,4 @@
+// app/adminHome.tsx
 import { View, Button } from "react-native";
 import { useRouter } from "expo-router";
 

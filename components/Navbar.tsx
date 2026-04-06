@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+// components/Navbar.tsx
+import React, { useState, useContext } from "react";
 import {
   View,
   Text,
@@ -6,11 +7,21 @@ import {
   TouchableOpacity,
   Dimensions,
 } from "react-native";
+import { useRouter } from "expo-router";
+import { AuthContext } from "../context/AuthContext";
 
 const { width } = Dimensions.get("window");
 
 export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
+  const { logout } = useContext(AuthContext);
+  const router = useRouter();
+
+  const handleLogout = async () => {
+    await logout();
+    setMenuOpen(false);
+    router.push("/");
+  };
 
   return (
     <>
@@ -30,6 +41,24 @@ export default function Navbar() {
           {/* 🔵 Drawer (LEFT SIDE) */}
           <View style={styles.drawer}>
             <Text style={styles.menuText}>Menu</Text>
+
+            <TouchableOpacity
+              style={styles.menuButton}
+              onPress={() => {
+                setMenuOpen(false);
+                router.push("/profile");
+              }}
+            >
+              <Text style={styles.menuButtonText}>👤 Profile</Text>
+            </TouchableOpacity>
+
+            {/* 🔴 Logout Button */}
+            <TouchableOpacity 
+              style={styles.logoutButton} 
+              onPress={handleLogout}
+            >
+              <Text style={styles.logoutButtonText}>🚪 Logout</Text>
+            </TouchableOpacity>
           </View>
 
           {/* ⚫ Clickable outside area (RIGHT SIDE) */}
@@ -93,6 +122,38 @@ const styles = StyleSheet.create({
   menuText: {
     color: "white",
     fontSize: 18,
+    fontWeight: "bold",
+  },
+
+  // � Menu link row
+  menuButton: {
+    marginTop: 20,
+    paddingVertical: 12,
+    paddingHorizontal: 15,
+    backgroundColor: "#5a9df4",
+    borderRadius: 5,
+    alignItems: "center",
+  },
+
+  menuButtonText: {
+    color: "white",
+    fontSize: 16,
+    fontWeight: "bold",
+  },
+
+  // 🔴 Logout Button
+  logoutButton: {
+    marginTop: 15,
+    paddingVertical: 12,
+    paddingHorizontal: 15,
+    backgroundColor: "#ff6b6b",
+    borderRadius: 5,
+    alignItems: "center",
+  },
+
+  logoutButtonText: {
+    color: "white",
+    fontSize: 16,
     fontWeight: "bold",
   },
 });
