@@ -6,13 +6,12 @@ import {
   Button,
   SafeAreaView,
 } from "react-native";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 import Navbar from "../components/Navbar";
 import Column from "../components/Column";
 import AddTaskModal from "../components/AddTaskModal";
 import { TaskProvider, TaskContext } from "../context/TaskC0ntext";
-import { GestureHandlerRootView } from "react-native-gesture-handler";
-import { AuthProvider } from "../context/AuthContext";
 import Login from "./login";
 
 
@@ -20,9 +19,7 @@ import Login from "./login";
 export default function Index() {
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-      <AuthProvider>
-        <Login />
-      </AuthProvider>
+      <Login />
     </GestureHandlerRootView>
   );
 }

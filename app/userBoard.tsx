@@ -1,5 +1,5 @@
 // app/userBoard.tsx
-import React, { useContext } from "react";
+import React, { useContext, useEffect } from "react";
 import { SafeAreaView, View, StyleSheet, Text, TouchableOpacity } from "react-native";
 import Column from "../components/Column";
 import Navbar from "../components/Navbar";
@@ -10,8 +10,18 @@ import { AuthContext } from "../context/AuthContext";
 
 export default function UserBoard() {
   const { tasks } = useContext(TaskContext);
-  const { currentUser } = useContext(AuthContext);
+  const { currentUser, role } = useContext(AuthContext);
   const router = useRouter();
+
+  // Ensure user is logged in with correct role
+  useEffect(() => {
+    if (role && role !== "user") {
+      router.replace("/login");
+    }
+    if (!currentUser) {
+      router.replace("/user");
+    }
+  }, [role, currentUser]);
 
   // ✅ Only this user's tasks
   const myTasks = tasks.filter(

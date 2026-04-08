@@ -10,7 +10,7 @@ export default function UserLogin() {
   const [teamCode, setTeamCode] = useState("");
   const [userId, setUserId] = useState("");
 
-  const { setCurrentUser } = useContext(AuthContext);
+  const { setCurrentUser, setRole } = useContext(AuthContext);
   const router = useRouter();
 
   async function handleLogin() {
@@ -35,8 +35,9 @@ export default function UserLogin() {
       return;
     }
 
-    // Save logged-in user
+    // Save logged-in user and set role
     setCurrentUser(user);
+    await setRole("user");
 
     Alert.alert("Login successful");
 

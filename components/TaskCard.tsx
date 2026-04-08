@@ -1,6 +1,13 @@
 // components/TaskCard.tsx
-import React, { useContext } from "react";
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import React, { useContext, useState } from "react";
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  Modal,
+  Pressable,
+} from "react-native";
 import { Task, TaskStatus } from "../types/Task";
 import { TaskContext } from "../context/TaskC0ntext";
 import { AuthContext } from "../context/AuthContext";
@@ -8,7 +15,7 @@ import { AuthContext } from "../context/AuthContext";
 export default function TaskCard({ task }: { task: Task }) {
   const { moveTask, deleteTask } = useContext(TaskContext);
   const { role } = useContext(AuthContext) || {};
-  console.log("ROLE:", role);
+  const [popupVisible, setPopupVisible] = useState(false);
 
   const flow: TaskStatus[] = ["todo", "inprocess", "review", "completed"];
 
@@ -27,36 +34,60 @@ export default function TaskCard({ task }: { task: Task }) {
   }
 
   return (
-    <View style={styles.card}>
-      <Text style={styles.text}>{task.title}</Text>
+    <>
+      <TouchableOpacity
+        style={styles.card}
+        activeOpacity={0.8}
+        onPress={() => setPopupVisible(true)}
+      >
+        <Text style={styles.text}>{task.title}</Text>
 
-      <View style={styles.actions}>
-        
-        {/* 👤 USER → can move */}
-        {role === "user" && (
-          <>
-            <TouchableOpacity onPress={moveBackward}>
-              <Text style={styles.icon}>⬅️</Text>
+        <View style={styles.actions}>
+          {role === "user" && (
+            <>
+              <TouchableOpacity onPress={moveBackward}>
+                <Text style={styles.icon}>⬅️</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity onPress={moveForward}>
+                <Text style={styles.icon}>➡️</Text>
+              </TouchableOpacity>
+            </>
+          )}
+
+          {role === "admin" && (
+            <TouchableOpacity onPress={() => deleteTask(task.id)}>
+              <Text style={styles.icon}>❌</Text>
             </TouchableOpacity>
+          )}
+        </View>
+      </TouchableOpacity>
 
-            <TouchableOpacity onPress={moveForward}>
-              <Text style={styles.icon}>➡️</Text>
+      <Modal
+        visible={popupVisible}
+        animationType="fade"
+        transparent
+        onRequestClose={() => setPopupVisible(false)}
+      >
+        <Pressable style={styles.modalBackdrop} onPress={() => setPopupVisible(false)}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>Task details</Text>
+            <Text style={styles.modalLabel}>Name:</Text>
+            <Text style={styles.modalText}>{task.title}</Text>
+            <Text style={styles.modalLabel}>Assigned to:</Text>
+            <Text style={styles.modalText}>{task.assignedTo}</Text>
+            <TouchableOpacity
+              style={styles.closeButton}
+              onPress={() => setPopupVisible(false)}
+            >
+              <Text style={styles.closeText}>Close</Text>
             </TouchableOpacity>
-          </>
-        )}
-
-        {/* 👨‍💼 ADMIN → can delete */}
-        {role === "admin" && (
-          <TouchableOpacity onPress={() => deleteTask(task.id)}>
-            <Text style={styles.icon}>❌</Text>
-          </TouchableOpacity>
-        )}
-
-      </View>
-    </View>
+          </View>
+        </Pressable>
+      </Modal>
+    </>
   );
 }
-
 
 const styles = StyleSheet.create({
   card: {
@@ -80,5 +111,46 @@ const styles = StyleSheet.create({
   icon: {
     fontSize: 18,
     color: "#fff",
+  },
+  modalBackdrop: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.55)",
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 20,
+  },
+  modalContent: {
+    width: "100%",
+    maxWidth: 320,
+    backgroundColor: "#121212",
+    borderRadius: 14,
+    padding: 20,
+    elevation: 10,
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: "700",
+    color: "#fff",
+    marginBottom: 12,
+  },
+  modalLabel: {
+    color: "#888",
+    marginBottom: 4,
+  },
+  modalText: {
+    color: "#fff",
+    marginBottom: 12,
+    fontSize: 16,
+  },
+  closeButton: {
+    marginTop: 10,
+    backgroundColor: "#272727",
+    paddingVertical: 10,
+    borderRadius: 10,
+    alignItems: "center",
+  },
+  closeText: {
+    color: "#fff",
+    fontWeight: "600",
   },
 });
