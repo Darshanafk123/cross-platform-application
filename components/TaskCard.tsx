@@ -8,11 +8,12 @@ import {
   Modal,
   Pressable,
 } from "react-native";
+import { DraxView } from "react-native-drax";
 import { Task, TaskStatus } from "../types/Task";
 import { TaskContext } from "../context/TaskC0ntext";
 import { AuthContext } from "../context/AuthContext";
 
-export default function TaskCard({ task }: { task: Task }) {
+export default function TaskCard({ task, isDraggable }: { task: Task; isDraggable?: boolean }) {
   const { moveTask, deleteTask } = useContext(TaskContext);
   const { role } = useContext(AuthContext) || {};
   const [popupVisible, setPopupVisible] = useState(false);
@@ -35,33 +36,71 @@ export default function TaskCard({ task }: { task: Task }) {
 
   return (
     <>
-      <TouchableOpacity
-        style={styles.card}
-        activeOpacity={0.8}
-        onPress={() => setPopupVisible(true)}
-      >
-        <Text style={styles.text}>{task.title}</Text>
+      {isDraggable ? (
+        <DraxView
+          draggingStyle={styles.dragging}
+          dragReleasedStyle={styles.dragging}
+          hoverDraggingStyle={styles.hoverDragging}
+          payload={task.id}
+          longPressDelay={0}
+        >
+          <TouchableOpacity
+            style={styles.card}
+            activeOpacity={0.8}
+            onPress={() => setPopupVisible(true)}
+          >
+            <Text style={styles.text}>{task.title}</Text>
 
-        <View style={styles.actions}>
-          {role === "user" && (
-            <>
-              <TouchableOpacity onPress={moveBackward}>
-                <Text style={styles.icon}>⬅️</Text>
+            <View style={styles.actions}>
+              {role === "user" && (
+                <>
+                  <TouchableOpacity onPress={moveBackward}>
+                    <Text style={styles.icon}>⬅️</Text>
+                  </TouchableOpacity>
+
+                  <TouchableOpacity onPress={moveForward}>
+                    <Text style={styles.icon}>➡️</Text>
+                  </TouchableOpacity>
+                </>
+              )}
+
+              {role === "admin" && (
+                <TouchableOpacity onPress={() => deleteTask(task.id)}>
+                  <Text style={styles.icon}>❌</Text>
+                </TouchableOpacity>
+              )}
+            </View>
+          </TouchableOpacity>
+        </DraxView>
+      ) : (
+        <TouchableOpacity
+          style={styles.card}
+          activeOpacity={0.8}
+          onPress={() => setPopupVisible(true)}
+        >
+          <Text style={styles.text}>{task.title}</Text>
+
+          <View style={styles.actions}>
+            {role === "user" && (
+              <>
+                <TouchableOpacity onPress={moveBackward}>
+                  <Text style={styles.icon}>⬅️</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity onPress={moveForward}>
+                  <Text style={styles.icon}>➡️</Text>
+                </TouchableOpacity>
+              </>
+            )}
+
+            {role === "admin" && (
+              <TouchableOpacity onPress={() => deleteTask(task.id)}>
+                <Text style={styles.icon}>❌</Text>
               </TouchableOpacity>
-
-              <TouchableOpacity onPress={moveForward}>
-                <Text style={styles.icon}>➡️</Text>
-              </TouchableOpacity>
-            </>
-          )}
-
-          {role === "admin" && (
-            <TouchableOpacity onPress={() => deleteTask(task.id)}>
-              <Text style={styles.icon}>❌</Text>
-            </TouchableOpacity>
-          )}
-        </View>
-      </TouchableOpacity>
+            )}
+          </View>
+        </TouchableOpacity>
+      )}
 
       <Modal
         visible={popupVisible}
@@ -98,6 +137,13 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
+  },
+  dragging: {
+    opacity: 0.5,
+  },
+  hoverDragging: {
+    borderColor: "#fff",
+    borderWidth: 2,
   },
   text: {
     fontSize: 16,

@@ -1,6 +1,7 @@
 // app/board.tsx
 import React, { useContext, useState } from "react";
 import { View, StyleSheet, Button, SafeAreaView } from "react-native";
+import { DraxProvider } from "react-native-drax";
 
 import Navbar from "../components/Navbar";
 import Column from "../components/Column";
@@ -22,44 +23,46 @@ function Board() {
   const [modalVisible, setModalVisible] = useState(false);
 
   return (
-    <SafeAreaView style={{ flex: 1 }}>
-      <Navbar />
+    <DraxProvider>
+      <SafeAreaView style={{ flex: 1 }}>
+        <Navbar />
 
-      <Button title="Add Task" onPress={() => setModalVisible(true)} />
+        <Button title="Add Task" onPress={() => setModalVisible(true)} />
 
-      <View style={styles.row}>
-        <Column
-          title="Todo"
-          status="todo"
-          tasks={tasks.filter(t => t.status === "todo")}
+        <View style={styles.row}>
+          <Column
+            title="Todo"
+            status="todo"
+            tasks={tasks.filter(t => t.status === "todo")}
+          />
+
+          <Column
+            title="In Process"
+            status="inprocess"
+            tasks={tasks.filter(t => t.status === "inprocess")}
+          />
+        </View>
+
+        <View style={styles.row}>
+          <Column
+            title="Review"
+            status="review"
+            tasks={tasks.filter(t => t.status === "review")}
+          />
+
+          <Column
+            title="Completed"
+            status="completed"
+            tasks={tasks.filter(t => t.status === "completed")}
+          />
+        </View>
+
+        <AddTaskModal
+          visible={modalVisible}
+          onClose={() => setModalVisible(false)}
         />
-
-        <Column
-          title="In Process"
-          status="inprocess"
-          tasks={tasks.filter(t => t.status === "inprocess")}
-        />
-      </View>
-
-      <View style={styles.row}>
-        <Column
-          title="Review"
-          status="review"
-          tasks={tasks.filter(t => t.status === "review")}
-        />
-
-        <Column
-          title="Completed"
-          status="completed"
-          tasks={tasks.filter(t => t.status === "completed")}
-        />
-      </View>
-
-      <AddTaskModal
-        visible={modalVisible}
-        onClose={() => setModalVisible(false)}
-      />
-    </SafeAreaView>
+      </SafeAreaView>
+    </DraxProvider>
   );
 }
 export default Board;

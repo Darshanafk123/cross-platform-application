@@ -1,7 +1,7 @@
 // components/Column.tsx
 import React, { useContext, useRef } from "react";
 import { View, Text, StyleSheet, Animated, ScrollView, Dimensions } from "react-native";
-import DraggableFlatList from "react-native-draggable-flatlist";
+import { DraxView } from "react-native-drax";
 import TaskCard from "./TaskCard";
 import { Task, TaskStatus } from "../types/Task";
 import { TaskContext } from "../context/TaskC0ntext";
@@ -20,7 +20,13 @@ export default function Column({ title, status, tasks }: Props) {
   const maxHeight = Dimensions.get("window").height * 0.35; // Each column gets 35% of screen height
 
   return (
-    <View style={styles.column}>
+    <DraxView
+      style={styles.column}
+      receivingStyle={styles.receiving}
+      onReceiveDragDrop={({ dragged: { payload } }) => {
+        moveTask(payload, status);
+      }}
+    >
       <Text style={styles.title}>{title}</Text>
       <Text style={styles.count}>{tasks.length} tasks</Text>
 
@@ -36,30 +42,15 @@ export default function Column({ title, status, tasks }: Props) {
           scrollIndicatorInsets={{ right: -8 }}
           style={styles.scrollView}
         >
-          <DraggableFlatList
-            data={tasks}
-            keyExtractor={item => item.id}
-            renderItem={({ item, drag }) => {
-              const isOwner = item.assignedTo === currentUser?.id;
-              return (
-                <View
-                  onTouchStart={isOwner || role === "admin" ? drag : undefined}
-                  style={{ opacity: isOwner || role === "admin" ? 1 : 0.5 }}
-                >
-                  <TaskCard task={item} />
-                </View>
-              );
-            }}
-            onDragEnd={({ data }) => {
-              data.forEach(task => {
-                moveTask(task.id, status);
-              });
-            }}
-            scrollEnabled={false}
-          />
+          {tasks.map(task => {
+            const isOwner = task.assignedTo === currentUser?.id;
+            return (
+              <TaskCard key={task.id} task={task} isDraggable={isOwner || role === "admin"} />
+            );
+          })}
         </Animated.ScrollView>
       </View>
-    </View>
+    </DraxView>
   );
 }
 
@@ -69,6 +60,9 @@ const styles = StyleSheet.create({
     padding: 10,
     borderRadius: 10,
     flex: 1,
+  },
+  receiving: {
+    backgroundColor: "#222",
   },
   title: {
     fontWeight: "bold",
