@@ -1,10 +1,9 @@
-// app/userBoard.tsx
 import React, { useContext, useEffect } from "react";
 import { SafeAreaView, View, StyleSheet, Text, TouchableOpacity } from "react-native";
 import Column from "../components/Column";
 import Navbar from "../components/Navbar";
 import { Stack, useRouter } from "expo-router";
-
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { TaskContext } from "../context/TaskC0ntext";
 import { AuthContext } from "../context/AuthContext";
 
@@ -13,7 +12,6 @@ export default function UserBoard() {
   const { currentUser, role } = useContext(AuthContext);
   const router = useRouter();
 
-  // Ensure user is logged in with correct role
   useEffect(() => {
     if (role && role !== "user") {
       router.replace("/login");
@@ -23,49 +21,48 @@ export default function UserBoard() {
     }
   }, [role, currentUser]);
 
-  // ✅ Only this user's tasks
   const myTasks = tasks.filter(
     (t) => t.assignedTo === currentUser?.id
   );
 
   return (
-    <SafeAreaView style={styles.container}>
-      <Stack.Screen options = {{ title: `Welcome ${currentUser?.name || "User"} 👋` }} />
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => router.back()}>
-          <Text style={styles.backText}>← Back</Text>
-        </TouchableOpacity>
-      </View>
-      <Navbar />
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <SafeAreaView style={styles.container}>
+        <Stack.Screen options={{ title: `Welcome ${currentUser?.name || "User"} 👋` }} />
+        <View style={styles.header}>
+          <TouchableOpacity onPress={() => router.back()}>
+            <Text style={styles.backText}>← Back</Text>
+          </TouchableOpacity>
+        </View>
+        <Navbar />
 
-      <View style={styles.row}>
-        <Column
-          title="Todo"
-          status="todo"
-          tasks={myTasks.filter(t => t.status === "todo")}
-        />
+        <View style={styles.row}>
+          <Column
+            title="Todo"
+            status="todo"
+            tasks={myTasks.filter(t => t.status === "todo")}
+          />
+          <Column
+            title="In Process"
+            status="inprocess"
+            tasks={myTasks.filter(t => t.status === "inprocess")}
+          />
+        </View>
 
-        <Column
-          title="In Process"
-          status="inprocess"
-          tasks={myTasks.filter(t => t.status === "inprocess")}
-        />
-      </View>
-
-      <View style={styles.row}>
-        <Column
-          title="Review"
-          status="review"
-          tasks={myTasks.filter(t => t.status === "review")}
-        />
-
-        <Column
-          title="Completed"
-          status="completed"
-          tasks={myTasks.filter(t => t.status === "completed")}
-        />
-      </View>
-    </SafeAreaView>
+        <View style={styles.row}>
+          <Column
+            title="Review"
+            status="review"
+            tasks={myTasks.filter(t => t.status === "review")}
+          />
+          <Column
+            title="Completed"
+            status="completed"
+            tasks={myTasks.filter(t => t.status === "completed")}
+          />
+        </View>
+      </SafeAreaView>
+    </GestureHandlerRootView>
   );
 }
 

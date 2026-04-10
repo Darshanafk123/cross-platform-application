@@ -1,7 +1,6 @@
-// app/user.tsx
 import React, { useState, useContext } from "react";
 import { View, Text, TouchableOpacity, TextInput, Button, Alert, StyleSheet } from "react-native";
-import { loadTeam } from "../storage/teamstorage";
+import { loadTeamByCredentials } from "../storage/teamstorage";
 import { AuthContext } from "../context/AuthContext";
 import { useRouter } from "expo-router";
 
@@ -10,24 +9,17 @@ export default function UserLogin() {
   const [teamCode, setTeamCode] = useState("");
   const [userId, setUserId] = useState("");
 
-  const { setCurrentUser, setRole } = useContext(AuthContext);
+  const { setCurrentUser, setRole, setTeamId } = useContext(AuthContext);
   const router = useRouter();
 
   async function handleLogin() {
-    const team = await loadTeam();
+    const team = await loadTeamByCredentials(teamName, teamCode);
 
     if (!team) {
-      Alert.alert("No team found");
-      return;
-    }
-
-    // Validate team
-    if (team.teamName !== teamName || team.teamCode !== teamCode) {
       Alert.alert("Invalid team details");
       return;
     }
 
-    // Find user
     const user = team.users.find((u: any) => u.id === userId);
 
     if (!user) {
@@ -35,12 +27,11 @@ export default function UserLogin() {
       return;
     }
 
-    // Save logged-in user and set role
-    setCurrentUser(user);
+    await setCurrentUser(user);
     await setRole("user");
+    await setTeamId(team.teamId);
 
     Alert.alert("Login successful");
-
     router.push("/userBoard");
   }
 

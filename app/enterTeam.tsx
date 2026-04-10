@@ -1,31 +1,27 @@
-// app/enterTeam.tsx
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import { View, TextInput, Button, Alert, StyleSheet } from "react-native";
-import { loadTeam } from "../storage/teamstorage";
+import { loadTeamByCredentials } from "../storage/teamstorage";
 import { useRouter } from "expo-router";
+import { AuthContext } from "../context/AuthContext";
 
 export default function EnterTeam() {
   const [teamName, setTeamName] = useState("");
   const [teamCode, setTeamCode] = useState("");
 
   const router = useRouter();
+  const { setTeamId } = useContext(AuthContext);
 
   async function handleEnterTeam() {
-    const team = await loadTeam();
+    const team = await loadTeamByCredentials(teamName, teamCode);
 
     if (!team) {
-      Alert.alert("No team found");
-      return;
-    }
-
-    if (team.teamName !== teamName || team.teamCode !== teamCode) {
       Alert.alert("Invalid team details");
       return;
     }
 
+    await setTeamId(team.teamId);
     Alert.alert("Access Granted");
-
-    router.push("/adminBoard"); // or your board screen
+    router.push("/adminBoard");
   }
 
   return (

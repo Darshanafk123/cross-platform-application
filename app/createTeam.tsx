@@ -1,5 +1,4 @@
-// app/createTeam.tsx
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import {
   View,
   Text,
@@ -9,6 +8,8 @@ import {
   FlatList,
 } from "react-native";
 import { saveTeam } from "../storage/teamstorage";
+import { useRouter } from "expo-router";
+import { AuthContext } from "../context/AuthContext";
 
 export default function CreateTeam() {
   const [teamName, setTeamName] = useState("");
@@ -16,10 +17,11 @@ export default function CreateTeam() {
   const [users, setUsers] = useState<any[]>([]);
   const [userName, setUserName] = useState("");
   const [userId, setUserId] = useState("");
+  const router = useRouter();
+  const { setTeamId } = useContext(AuthContext);
 
   function addUser() {
     if (!userName || !userId) return;
-
     setUsers(prev => [...prev, { name: userName, id: userId }]);
     setUserName("");
     setUserId("");
@@ -34,22 +36,26 @@ export default function CreateTeam() {
     const team = {
       teamName,
       teamCode,
-      adminId: "admin", // for now static
+      adminId: "admin",
       users,
     };
 
-    await saveTeam(team);
+    const newTeam = await saveTeam(team);
 
-    console.log("TEAM CREATED:", team);
+    if (!newTeam) {
+      alert("Failed to create team");
+      return;
+    }
 
+    await setTeamId(newTeam.id);
     alert(`Team Created!\nCode: ${team.teamCode}`);
+    router.push("/adminBoard");
   }
 
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Create Team</Text>
 
-      {/* Team Name */}
       <TextInput
         placeholder="Enter Team Name"
         value={teamName}
@@ -57,7 +63,6 @@ export default function CreateTeam() {
         style={styles.input}
       />
 
-      {/* Team Code */}
       <TextInput
         placeholder="Enter Team Code"
         value={teamCode}
@@ -65,7 +70,6 @@ export default function CreateTeam() {
         style={styles.input}
       />
 
-      {/* Add User */}
       <Text style={styles.subtitle}>Add Team Members</Text>
 
       <TextInput
@@ -84,7 +88,6 @@ export default function CreateTeam() {
 
       <Button title="Add User" onPress={addUser} />
 
-      {/* User List */}
       <FlatList
         data={users}
         keyExtractor={(item) => item.id}
@@ -95,9 +98,7 @@ export default function CreateTeam() {
         )}
       />
 
-      {/* Create Team */}
       <Button title="Create Team" onPress={handleCreateTeam} />
-      
     </View>
   );
 }

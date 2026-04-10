@@ -1,57 +1,58 @@
-// context/TaskC0ntext.tsx
-import React, { createContext, useState, useEffect, ReactNode } from "react";
+import React, { createContext, useState, useEffect, useContext, useRef } from "react";
 import { Task, TaskStatus } from "../types/Task";
-import { saveTasks, loadTasks } from "../storage/taskStorage";
+import { saveTasks, loadTasks, deleteTaskById } from "../storage/taskStorage";
+import { AuthContext } from "./AuthContext";
+import "react-native-get-random-values";
+import { v4 as uuidv4 } from "uuid";
 
-interface TaskContextType {
-  tasks: Task[];
-  addTask: (title: string, assignedTo: string) => void;
-  moveTask: (taskId: string, status: TaskStatus) => void;
-  deleteTask: (taskId: string) => void;
-}
+export const TaskContext = createContext<any>(null);
 
-export const TaskContext = createContext<TaskContextType>({
-  tasks: [],
-  addTask: () => {},
-  moveTask: () => {},
-  deleteTask: () => {},
-});
-
-export function TaskProvider({ children }: { children: ReactNode }) {
+export function TaskProvider({ children }: any) {
   const [tasks, setTasks] = useState<Task[]>([]);
+  const { teamId } = useContext(AuthContext);
+  const tasksRef = useRef(tasks);
+  tasksRef.current = tasks;
 
+  // Load + poll every 3 seconds
   useEffect(() => {
-    loadTasks().then(setTasks);
-  }, []);
+    if (!teamId) return;
 
-  useEffect(() => {
-    saveTasks(tasks);
-  }, [tasks]);
+    async function fetchTasks() {
+      const loaded = await loadTasks(teamId);
+      setTasks(loaded);
+    }
 
-  function addTask(title: string, assignedTo: string) {
+    fetchTasks();
+    const interval = setInterval(fetchTasks, 3000);
+    return () => clearInterval(interval);
+  }, [teamId]);
+
+  async function addTask(title: string, assignedTo: string) {
+    if (!teamId) return;
     const newTask: Task = {
-      id: Date.now().toString(),
+      id: uuidv4(),
       title,
-      assignedTo,
       status: "todo",
+      assignedTo,
     };
-    setTasks(prev => [...prev, newTask]);
+    const updated = [...tasksRef.current, newTask];
+    setTasks(updated);
+    await saveTasks(updated, teamId);
   }
 
-  function moveTask(taskId: string, status: TaskStatus) {
-    setTasks(prev =>
-      prev.map(task =>
-        task.id === taskId
-          ? { ...task, status }
-          : task
-      )
+  async function moveTask(id: string, newStatus: TaskStatus) {
+    if (!teamId) return;
+    const updated = tasksRef.current.map(t =>
+      t.id === id ? { ...t, status: newStatus } : t
     );
+    setTasks(updated);
+    await saveTasks(updated, teamId);
   }
 
-  function deleteTask(taskId: string) {
-    setTasks(prev =>
-      prev.filter(task => task.id !== taskId)
-    );
+  async function deleteTask(id: string) {
+    const updated = tasksRef.current.filter(t => t.id !== id);
+    setTasks(updated);
+    await deleteTaskById(id);
   }
 
   return (
