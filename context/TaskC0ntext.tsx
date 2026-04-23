@@ -4,6 +4,7 @@ import { saveTasks, loadTasks, deleteTaskById } from "../storage/taskStorage";
 import { AuthContext } from "./AuthContext";
 import "react-native-get-random-values";
 import { v4 as uuidv4 } from "uuid";
+import { supabase } from "../lib/supabase";
 
 export const TaskContext = createContext<any>(null);
 
@@ -13,7 +14,6 @@ export function TaskProvider({ children }: any) {
   const tasksRef = useRef(tasks);
   tasksRef.current = tasks;
 
-  // Load + poll every 3 seconds
   useEffect(() => {
     if (!teamId) return;
 
@@ -29,15 +29,32 @@ export function TaskProvider({ children }: any) {
 
   async function addTask(title: string, assignedTo: string) {
     if (!teamId) return;
+
     const newTask: Task = {
       id: uuidv4(),
       title,
       status: "todo",
       assignedTo,
     };
+
     const updated = [...tasksRef.current, newTask];
     setTasks(updated);
     await saveTasks(updated, teamId);
+
+    // 👇 Send push notification to assigned user
+    const { error } = await supabase.functions.invoke("send-task-notification", {
+      body: {
+        taskTitle: title,
+        assignedTo,
+        teamId,
+      },
+    });
+
+    if (error) {
+      console.log("Notification error:", error);
+    } else {
+      console.log("Notification triggered for:", assignedTo);
+    }
   }
 
   async function moveTask(id: string, newStatus: TaskStatus) {

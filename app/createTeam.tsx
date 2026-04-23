@@ -1,11 +1,7 @@
 import React, { useState, useContext } from "react";
 import {
-  View,
-  Text,
-  TextInput,
-  Button,
-  StyleSheet,
-  FlatList,
+  View, Text, TextInput, TouchableOpacity,
+  StyleSheet, ActivityIndicator, SafeAreaView, Alert,
 } from "react-native";
 import { saveTeam } from "../storage/teamstorage";
 import { useRouter } from "expo-router";
@@ -14,117 +10,100 @@ import { AuthContext } from "../context/AuthContext";
 export default function CreateTeam() {
   const [teamName, setTeamName] = useState("");
   const [teamCode, setTeamCode] = useState("");
-  const [users, setUsers] = useState<any[]>([]);
-  const [userName, setUserName] = useState("");
-  const [userId, setUserId] = useState("");
+  const [loading, setLoading] = useState(false);
   const router = useRouter();
-  const { setTeamId } = useContext(AuthContext);
-
-  function addUser() {
-    if (!userName || !userId) return;
-    setUsers(prev => [...prev, { name: userName, id: userId }]);
-    setUserName("");
-    setUserId("");
-  }
+  const { setTeamId, profile } = useContext(AuthContext);
 
   async function handleCreateTeam() {
-    if (!teamName || !teamCode || users.length === 0) {
-      alert("Please enter team name, team code, and add at least one user");
+    if (!teamName || !teamCode) {
+      Alert.alert("Please enter team name and team code");
       return;
     }
 
-    const team = {
-      teamName,
-      teamCode,
-      adminId: "admin",
-      users,
-    };
+    setLoading(true);
 
-    const newTeam = await saveTeam(team);
+    const newTeam = await saveTeam(
+      { teamName, teamCode },
+      profile.id  // 👈 pass real admin profile id
+    );
+
+    setLoading(false);
 
     if (!newTeam) {
-      alert("Failed to create team");
+      Alert.alert("Failed to create team");
       return;
     }
 
     await setTeamId(newTeam.id);
-    alert(`Team Created!\nCode: ${team.teamCode}`);
+    Alert.alert("Team Created!", `Code: ${teamCode}`);
     router.push("/adminBoard");
   }
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
+      <TouchableOpacity onPress={() => router.back()}>
+        <Text style={styles.back}>← Back</Text>
+      </TouchableOpacity>
+
       <Text style={styles.title}>Create Team</Text>
+      <Text style={styles.subtitle}>
+        You can invite members after creating the team
+      </Text>
 
       <TextInput
-        placeholder="Enter Team Name"
+        style={styles.input}
+        placeholder="Team Name"
+        placeholderTextColor="#666"
         value={teamName}
         onChangeText={setTeamName}
-        style={styles.input}
       />
 
       <TextInput
-        placeholder="Enter Team Code"
+        style={styles.input}
+        placeholder="Team Code"
+        placeholderTextColor="#666"
         value={teamCode}
         onChangeText={setTeamCode}
-        style={styles.input}
       />
 
-      <Text style={styles.subtitle}>Add Team Members</Text>
-
-      <TextInput
-        placeholder="User Name"
-        value={userName}
-        onChangeText={setUserName}
-        style={styles.input}
-      />
-
-      <TextInput
-        placeholder="User ID"
-        value={userId}
-        onChangeText={setUserId}
-        style={styles.input}
-      />
-
-      <Button title="Add User" onPress={addUser} />
-
-      <FlatList
-        data={users}
-        keyExtractor={(item) => item.id}
-        renderItem={({ item }) => (
-          <Text style={styles.userItem}>
-            {item.name} ({item.id})
-          </Text>
-        )}
-      />
-
-      <Button title="Create Team" onPress={handleCreateTeam} />
-    </View>
+      <TouchableOpacity
+        style={styles.button}
+        onPress={handleCreateTeam}
+        disabled={loading}
+      >
+        {loading
+          ? <ActivityIndicator color="#fff" />
+          : <Text style={styles.buttonText}>Create Team</Text>
+        }
+      </TouchableOpacity>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    padding: 20,
-    gap: 10,
+    flex: 1, backgroundColor: "#000", padding: 24,
+  },
+  back: {
+    color: "#4a77f2", fontSize: 15, marginTop: 10, marginBottom: 24,
   },
   title: {
-    fontSize: 22,
-    fontWeight: "bold",
+    fontSize: 26, fontWeight: "bold", color: "#fff", marginBottom: 8,
   },
   subtitle: {
-    marginTop: 10,
-    fontWeight: "bold",
+    fontSize: 14, color: "#666", marginBottom: 32,
   },
   input: {
-    borderWidth: 1,
-    padding: 10,
-    borderRadius: 5,
+    backgroundColor: "#111", color: "#fff",
+    borderWidth: 1, borderColor: "#333",
+    borderRadius: 10, padding: 14,
+    marginBottom: 14, fontSize: 15,
   },
-  userItem: {
-    padding: 5,
-    backgroundColor: "#eee",
-    marginTop: 5,
+  button: {
+    backgroundColor: "#4a77f2", borderRadius: 10,
+    padding: 15, alignItems: "center", marginTop: 6,
+  },
+  buttonText: {
+    color: "#fff", fontWeight: "bold", fontSize: 16,
   },
 });

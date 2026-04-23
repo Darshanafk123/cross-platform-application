@@ -14,25 +14,9 @@ import { TaskContext } from "../context/TaskC0ntext";
 import { AuthContext } from "../context/AuthContext";
 
 export default function TaskCard({ task, isDraggable }: { task: Task; isDraggable?: boolean }) {
-  const { moveTask, deleteTask } = useContext(TaskContext);
+  const { deleteTask } = useContext(TaskContext);
   const { role } = useContext(AuthContext) || {};
   const [popupVisible, setPopupVisible] = useState(false);
-
-  const flow: TaskStatus[] = ["todo", "inprocess", "review", "completed"];
-
-  function moveForward() {
-    const currentIndex = flow.indexOf(task.status);
-    if (currentIndex < flow.length - 1) {
-      moveTask(task.id, flow[currentIndex + 1]);
-    }
-  }
-
-  function moveBackward() {
-    const currentIndex = flow.indexOf(task.status);
-    if (currentIndex > 0) {
-      moveTask(task.id, flow[currentIndex - 1]);
-    }
-  }
 
   return (
     <>
@@ -42,7 +26,7 @@ export default function TaskCard({ task, isDraggable }: { task: Task; isDraggabl
           dragReleasedStyle={styles.dragging}
           hoverDraggingStyle={styles.hoverDragging}
           payload={task.id}
-          longPressDelay={0}
+          longPressDelay={500}
         >
           <TouchableOpacity
             style={styles.card}
@@ -53,15 +37,9 @@ export default function TaskCard({ task, isDraggable }: { task: Task; isDraggabl
 
             <View style={styles.actions}>
               {role === "user" && (
-                <>
-                  <TouchableOpacity onPress={moveBackward}>
-                    <Text style={styles.icon}>⬅️</Text>
-                  </TouchableOpacity>
-
-                  <TouchableOpacity onPress={moveForward}>
-                    <Text style={styles.icon}>➡️</Text>
-                  </TouchableOpacity>
-                </>
+                <TouchableOpacity onPress={() => setPopupVisible(true)}>
+                  <Text style={styles.icon}>⋮</Text>
+                </TouchableOpacity>
               )}
 
               {role === "admin" && (
@@ -82,15 +60,9 @@ export default function TaskCard({ task, isDraggable }: { task: Task; isDraggabl
 
           <View style={styles.actions}>
             {role === "user" && (
-              <>
-                <TouchableOpacity onPress={moveBackward}>
-                  <Text style={styles.icon}>⬅️</Text>
-                </TouchableOpacity>
-
-                <TouchableOpacity onPress={moveForward}>
-                  <Text style={styles.icon}>➡️</Text>
-                </TouchableOpacity>
-              </>
+              <TouchableOpacity onPress={() => setPopupVisible(true)}>
+                <Text style={styles.icon}>⋮</Text>
+              </TouchableOpacity>
             )}
 
             {role === "admin" && (
@@ -155,7 +127,7 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   icon: {
-    fontSize: 18,
+    fontSize: 24,
     color: "#fff",
   },
   modalBackdrop: {

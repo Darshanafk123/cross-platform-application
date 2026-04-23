@@ -18,7 +18,7 @@ export default function UserBoard() {
       router.replace("/login");
     }
     if (!currentUser) {
-      router.replace("/user");
+      router.replace("/userTeams");
     }
   }, [role, currentUser]);
 
@@ -30,12 +30,17 @@ export default function UserBoard() {
     <GestureHandlerRootView style={{ flex: 1 }}>
       <DraxProvider>
         <SafeAreaView style={styles.container}>
-          <Stack.Screen options={{ title: `Welcome ${currentUser?.name || "User"} 👋` }} />
+          <Stack.Screen options={{
+            title: `Welcome ${currentUser?.name || "User"} 👋`,
+          }} />
+
+          {/* 👇 Updated back button goes to userTeams */}
           <View style={styles.header}>
-            <TouchableOpacity onPress={() => router.back()}>
-              <Text style={styles.backText}>← Back</Text>
+            <TouchableOpacity onPress={() => router.replace("/userTeams")}>
+              <Text style={styles.backText}>← Teams</Text>
             </TouchableOpacity>
           </View>
+
           <Navbar />
 
           <View style={styles.row}>
